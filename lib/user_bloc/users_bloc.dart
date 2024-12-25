@@ -13,40 +13,46 @@ part 'users_state.dart';
 
 class UsersBloc extends Bloc<UsersEvent, UsersState> {
   UsersBloc() : super(UsersInitial()) {
+    //для поиска пользователя по имени
     on<GetUserEvent>(
       (event, emit) async {
         emit(LoadingState());
 
-        //String mainUrl =
-        //'https://jsonplaceholder.typicode.com/users?id=${event.userid}';
         String mainUrl = 'https://jsonplaceholder.typicode.com/users';
         final uri = Uri.parse(mainUrl);
 
         try {
           final response = await http.get(uri);
+
           final data = jsonDecode(response.body);
 
-          final user = data.firstWhere(
-            (element) => element['name'] == event.name,
-            orElse: () => null,
-          );
+          final filteredUsers = data.where((element) {
+            if (!element.containsKey('name')) return false;
+            final username = element['name'].toString().toLowerCase();
+            final searchName = (event.name ?? '').toLowerCase();
+            return username.contains(searchName);
+          }).toList();
 
-          if (user != null) {
-            User foundUser = User.fromJson(user);
-
-            log('User Found: $foundUser');
-
-            emit(UsersLoadedState2(usersy: [foundUser]));
-          } else {
-            log('User not found');
+          if (filteredUsers.isEmpty) {
+            log('Нет пользователей с таким именем');
+            emit(UsersLoadedState2(usersy: [])); // Пустой список
+            return;
           }
+
+          List<User> users =
+              filteredUsers.map((u) => User.fromJson(u)).toList();
+
+          log('Найденные совпадания: $users');
+
+          emit(UsersLoadedState2(usersy: users));
         } catch (e) {
-          log(e.toString());
+          log('Ошибка: ${e.toString()}');
           emit(ErrorState(message: e.toString()));
         }
       },
     );
 
+    //для поиска постов пользователя
     on<GetUsersPostsEvent>(
       (event, emit) async {
         emit(LoadingState());
@@ -74,6 +80,7 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
       },
     );
 
+    //для получения всех пользователей
     on<GetUsersEvent>(
       (event, emit) async {
         emit(LoadingState());
@@ -99,6 +106,7 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
       },
     );
 
+    //для комментариев к посту
     on<GetUserPostCommentsEvent>(
       (event, emit) async {
         emit(LoadingState());
