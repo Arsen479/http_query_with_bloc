@@ -10,9 +10,9 @@ class GetUsersPostsEvent extends UsersEvent {
 }
 
 class GetUserEvent extends UsersEvent {
-  final String userid;
+  final String name;
 
-  GetUserEvent({required this.userid});
+  GetUserEvent({required this.name});
 }
 
 class GetUsersEvent extends UsersEvent {}

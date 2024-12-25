@@ -50,7 +50,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             onChanged: (value) {
               if (value.isNotEmpty) {
-                usersBloc.add(GetUserEvent(userid: controller.text));
+                usersBloc.add(GetUserEvent(name: controller.text));
               } else {
                 usersBloc.add(GetUsersEvent());
               }

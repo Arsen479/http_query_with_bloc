@@ -27,7 +27,7 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
           final data = jsonDecode(response.body);
 
           final user = data.firstWhere(
-            (element) => element['name'] == event.userid,
+            (element) => element['name'] == event.name,
             orElse: () => null,
           );
 
