@@ -48,8 +48,12 @@ class _MyHomePageState extends State<MyHomePage> {
             decoration: const InputDecoration(
               hintText: 'Search',
             ),
-            onSubmitted: (value) {
-              usersBloc.add(GetUserEvent(userid: controller.text));
+            onChanged: (value) {
+              if (value.isNotEmpty) {
+                usersBloc.add(GetUserEvent(userid: controller.text));
+              } else {
+                usersBloc.add(GetUsersEvent());
+              }
             },
           ),
           const SizedBox(
