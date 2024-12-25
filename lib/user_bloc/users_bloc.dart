@@ -17,20 +17,32 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
       (event, emit) async {
         emit(LoadingState());
 
-        String mainUrl =
-            'https://jsonplaceholder.typicode.com/users?id=${event.userid}';
+        //String mainUrl =
+        //'https://jsonplaceholder.typicode.com/users?id=${event.userid}';
+        String mainUrl = 'https://jsonplaceholder.typicode.com/users';
         final uri = Uri.parse(mainUrl);
 
         try {
           final response = await http.get(uri);
           final data = jsonDecode(response.body);
-          User users = User.fromJson(data[0]);
 
-          log('Response status: $users');
+          final user = data.firstWhere(
+            (element) => element['name'] == event.userid,
+            orElse: () => null,
+          );
 
-          emit(UsersLoadedState2(usersy: [users]));
+          if (user != null) {
+            User foundUser = User.fromJson(user);
+
+            log('User Found: $foundUser');
+
+            emit(UsersLoadedState2(usersy: [foundUser]));
+          } else {
+            log('User not found');
+          }
         } catch (e) {
           log(e.toString());
+          emit(ErrorState(message: e.toString()));
         }
       },
     );
@@ -57,6 +69,7 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
           emit(UserPostLoadedState(post: users));
         } catch (e) {
           log(e.toString());
+          emit(ErrorState(message: e.toString()));
         }
       },
     );
@@ -81,6 +94,7 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
           emit(UsersLoadedState2(usersy: users));
         } catch (e) {
           log(e.toString());
+          emit(ErrorState(message: e.toString()));
         }
       },
     );
