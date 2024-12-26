@@ -24,23 +24,17 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
         try {
           final response = await http.get(uri);
 
-          final data = jsonDecode(response.body);
+          final  data = jsonDecode(response.body);
 
-          final filteredUsers = data.where((element) {
+          final  filteredUsers = data.where((element) {
             if (!element.containsKey('name')) return false;
             final username = element['name'].toString().toLowerCase();
-            final searchName = (event.name ?? '').toLowerCase();
+            final searchName = event.name.toLowerCase();
             return username.contains(searchName);
           }).toList();
 
-          if (filteredUsers.isEmpty) {
-            log('Нет пользователей с таким именем');
-            emit(UsersLoadedState2(usersy: [])); // Пустой список
-            return;
-          }
-
           List<User> users =
-              filteredUsers.map((u) => User.fromJson(u)).toList();
+              filteredUsers.map((element) => User.fromJson(element)).toList();
 
           log('Найденные совпадания: $users');
 
