@@ -24,10 +24,9 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
         try {
           final response = await http.get(uri);
 
-          final  data = jsonDecode(response.body);
+          final data = jsonDecode(response.body);
 
-          final  filteredUsers = data.where((element) {
-            if (!element.containsKey('name')) return false;
+          final filteredUsers = data.where((element) {
             final username = element['name'].toString().toLowerCase();
             final searchName = event.name.toLowerCase();
             return username.contains(searchName);
